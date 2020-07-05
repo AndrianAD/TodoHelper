@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'event.dart';
 
@@ -35,9 +36,10 @@ class _SampleAppPageState extends State<SampleAppPage> {
 
   getEvents() async {
     var url = 'http://uncroptv.000webhostapp.com/Read.php';
-    var response = await post(url, body: {'id': '93'});
+    var response = await post(url, body: {'id': '92'});
     final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
     widgets = parsed.map<Event>((json) => Event.fromJson(json)).toList();
+    setState(() {});
   }
 
   @override
@@ -49,6 +51,24 @@ class _SampleAppPageState extends State<SampleAppPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Fluttertoast.showToast(
+                msg: "This is Center Short Toast",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0
+            );
+          },
+          child: Icon(
+            Icons.control_point,
+            color: Colors.greenAccent,
+          ),
+          backgroundColor: Colors.pink,
+        ),
         appBar: AppBar(
           title: Text("Todo Helper"),
         ),
@@ -70,11 +90,16 @@ class _SampleAppPageState extends State<SampleAppPage> {
   }
 }
 
-class CardWidget extends StatelessWidget {
-  Event event;
+class CardWidget extends StatefulWidget {
+  final Event event;
 
   CardWidget(this.event);
 
+  @override
+  _CardWidgetState createState() => _CardWidgetState();
+}
+
+class _CardWidgetState extends State<CardWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -87,17 +112,35 @@ class CardWidget extends StatelessWidget {
           child: InkWell(
             splashColor: Colors.blue.withAlpha(30),
             onTap: () {
-              print(event.name);
+              print(widget.event.name);
             },
             child: Column(
               children: [
-                Text(event.name,
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
-                    child: Text(event.description))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                  child: Text(widget.event.name,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Container(
+                          alignment: Alignment.centerLeft,
+                          padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
+                          child: Text(widget.event.description)),
+                    ),
+                    Expanded(
+                      child: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
+                          child: Text(widget.event.time,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w300, fontSize: 12))),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
